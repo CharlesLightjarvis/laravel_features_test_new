@@ -1,0 +1,122 @@
+@startuml ClassDiagram
+
+' Définir les classes
+class User {
+  +id : bigint
+  +name : string
+  +email : string
+  +password : string
+  +provider : string
+  +provider_id : string
+  +access_token : string
+  +refresh_token : string
+  +avatar_url : string
+  +created_at : timestamp
+  +updated_at : timestamp
+}
+
+class Project {
+  +id : bigint
+  +name : string
+  +description : text
+  +owner_id : bigint
+  +created_at : timestamp
+  +updated_at : timestamp
+}
+
+class Task {
+  +id : bigint
+  +title : string
+  +description : text
+  +status : string
+  +assigned_to : bigint
+  +project_id : bigint
+  +due_date : date
+  +created_at : timestamp
+  +updated_at : timestamp
+}
+
+class Comment {
+  +id : bigint
+  +content : text
+  +user_id : bigint
+  +task_id : bigint
+  +created_at : timestamp
+  +updated_at : timestamp
+}
+
+class Notification {
+  +id : bigint
+  +type : string
+  +message : text
+  +user_id : bigint
+  +read_at : timestamp
+  +created_at : timestamp
+}
+
+class ActivityLog {
+  +id : bigint
+  +action : string
+  +user_id : bigint
+  +related_id : bigint
+  +related_type : string
+  +created_at : timestamp
+}
+
+class ProjectUser {
+  +id : bigint
+  +project_id : bigint
+  +user_id : bigint
+  +created_at : timestamp
+  +updated_at : timestamp
+}
+
+class Chat {
+  +id : bigint
+  +project_id : bigint
+  +created_at : timestamp
+  +updated_at : timestamp
+}
+
+class Message {
+  +id : bigint
+  +chat_id : bigint
+  +user_id : bigint
+  +content : text
+  +created_at : timestamp
+  +updated_at : timestamp
+}
+
+class MessageStatus {
+  +id : bigint
+  +message_id : bigint
+  +status : string
+  +user_id : bigint
+  +created_at : timestamp
+}
+
+class AuthLog {
+  +id : bigint
+  +user_id : bigint
+  +action : string
+  +ip_address : string
+  +created_at : timestamp
+}
+
+' Définir les relations
+User "1" -- "many" ProjectUser : "est membre de"
+Project "1" -- "many" ProjectUser : "a des membres"
+Project "1" -- "many" Task : "contient"
+Task "1" -- "many" Comment : "a des commentaires"
+User "1" -- "many" Comment : "écrit"
+User "1" -- "many" Task : "est assigné à"
+User "1" -- "many" Notification : "reçoit"
+User "1" -- "many" ActivityLog : "effectue"
+User "1" -- "many" AuthLog : "a des logs d'authentification"
+Project "1" -- "many" Chat : "a des conversations"
+Chat "1" -- "many" Message : "contient"
+User "1" -- "many" Message : "envoie"
+Message "1" -- "many" MessageStatus : "a un statut"
+User "1" -- "many" MessageStatus : "voit"
+
+@enduml

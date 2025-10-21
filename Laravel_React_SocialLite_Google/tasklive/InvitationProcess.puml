@@ -1,0 +1,28 @@
+@startuml Invitation
+start
+
+:Utilisateur (Owner) crée un projet;
+:Utilisateur (Owner) invite un autre utilisateur;
+
+if (Utilisateur existe ?) then (Oui)
+    :Envoyer l'invitation à l'utilisateur;
+    if (Invitation acceptée ?) then (Oui)
+        :Assigner un rôle à l'utilisateur;
+        :Ajouter l'utilisateur au projet;
+    else (Non)
+        :Annuler l'invitation;
+    endif
+else (Non)
+    :Créer un nouvel utilisateur;
+    :Envoyer l'invitation;
+    if (Invitation acceptée ?) then (Oui)
+        :Assigner un rôle à l'utilisateur;
+        :Ajouter l'utilisateur au projet;
+    else (Non)
+        :Annuler l'invitation;
+    endif
+endif
+
+:Notifier l'Owner de l'état de l'invitation;
+stop
+@enduml

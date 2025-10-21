@@ -1,0 +1,116 @@
+les scopes cest pour les requetes, 
+
+class User extends Model
+{
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+}
+
+// Utilisation dans l'application
+$activeUsers = User::active()->get();
+
+-------------------------------------------------------------------------------
+
+les macros pour etendre les fonctionnalites aux classes de facon globale, comme les reponses json (voir projet macro)
+autres exemples macro pour rajouter des foncions pour le request a part les validations faites par la classe request lui meme
+
+use Illuminate\Support\Facades\Request;
+
+Request::macro('isFromMobile', function () {
+    return Request::header('User-Agent') && preg_match('/mobile/i', Request::header('User-Agent'));
+});
+
+// Utilisation dans un contrôleur ou une route
+if (Request::isFromMobile()) {
+    // Exécuter du code spécifique pour les utilisateurs mobiles
+}
+
+
+use Illuminate\Support\Str;
+
+Str::macro('slugify', function ($value) {
+    return Str::slug($value);
+});
+
+// Utilisation dans l'application
+$slug = Str::slugify('Laravel is awesome');  // Résultat : 'laravel-is-awesome'
+
+
+use Carbon\Carbon;
+
+Carbon::macro('toReadableDate', function () {
+    return $this->format('l, jS F Y');
+});
+
+// Utilisation dans l'application
+$today = Carbon::now()->toReadableDate();  // Exemple : "Thursday, 3rd January 2025"
+
+
+use Illuminate\Support\Facades\Validator;
+
+Validator::macro('alphaNumericSpaces', function ($attribute, $value, $parameters, $validator) {
+    return preg_match('/^[a-zA-Z0-9 ]+$/', $value);
+});
+
+// Utilisation dans les règles de validation
+$request->validate([
+    'name' => 'required|alphaNumericSpaces',
+]);
+
+use Illuminate\Support\Facades\Mail;
+
+Mail::macro('sendWelcomeEmail', function ($user) {
+    return Mail::to($user->email)->send(new WelcomeEmail($user));
+});
+
+// Utilisation dans l'application
+$user = User::find(1);
+Mail::sendWelcomeEmail($user);
+
+
+--------------------------------------------------
+
+php artisan schema:dump : pour mettre toutes les migrations dans un seul fichier sql utile si on a enormement de migrations
+
+----------------------------------------------------
+- whereRelation : dans la methode eloquent
+- validation des dimensions dune image ->types, ->dimensions 
+defer method
+chaperone
+laravel debugbar & ide helper
+-------------------------------------------------------------------
+Différences entre sole() et firstOrFail() :
+
+firstOrFail() :
+
+Retourne le premier enregistrement trouvé, même s'il y en a plusieurs.
+Si aucun enregistrement n'est trouvé, elle lèvera une exception de type ModelNotFoundException.
+Elle ne lève pas d'exception si plusieurs enregistrements sont trouvés, mais retourne simplement le premier.
+
+sole() :
+
+Retourne le seul enregistrement trouvé dans la base de données.
+Si plus d'un résultat est trouvé, elle lèvera une exception de type ModelNotFoundException.
+Si aucun enregistrement n'est trouvé, elle lèvera également une exception de type ModelNotFoundException.
+Elle est plus stricte que firstOrFail(), car elle suppose qu'il ne doit y avoir qu'un seul résultat.
+
+-------------------
+once method, resolve -> handle
+-----------------------
+context, pipeline sur les requetes avec parametres
+---------------------
+annotation attributes laravel
+------------------
+Number Helper , rajouter des fonctions au collection(reponse retourne dans les methodes eloquent comme all())
+-----------------------
+route helper , $this->route() , on a le routeparameter qui le remplace dans le request et le currentUser aussi sous forme dattribut
+---------
+composer require laravel/dusk --dev
+php artisan dusk:install
+
+--------------------------------
+terminate dans la methode middleware pour executer un code apres le middleware
+
+methode defer : renvpyer une reponse au user sans le faire attendre , il check le status code si il est inferieur a 400 la fonction sexecute sinon non
