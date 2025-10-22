@@ -14,9 +14,7 @@ interface PostState {
 interface PostActions {
   fetchPosts: () => Promise<void>
   fetchPost: (id: number) => Promise<void>
-  createPost: (
-    data: CreatePostData,
-  ) => Promise<{
+  createPost: (data: CreatePostData) => Promise<{
     success: boolean
     message?: string
     errors?: Record<string, string[]>
@@ -29,9 +27,7 @@ interface PostActions {
     message?: string
     errors?: Record<string, string[]>
   }>
-  deletePost: (
-    id: number,
-  ) => Promise<{
+  deletePost: (id: number) => Promise<{
     success: boolean
     message?: string
     errors?: Record<string, string[]>
@@ -59,6 +55,8 @@ export const usePostStore = create<PostStore>()(
         set({ loading: true, error: null })
         try {
           const posts = await postService.getAllPosts()
+          console.log(posts)
+
           set({ posts, loading: false })
         } catch (error) {
           const errorMessage =
@@ -76,6 +74,7 @@ export const usePostStore = create<PostStore>()(
         set({ loading: true, error: null })
         try {
           const post = await postService.getPostById(id)
+
           set({ currentPost: post, loading: false })
         } catch (error) {
           const errorMessage =
@@ -92,11 +91,13 @@ export const usePostStore = create<PostStore>()(
       createPost: async (data: CreatePostData) => {
         set({ loading: true, error: null })
         try {
-          const { post, message } = await postService.createPost(data)
-          set((state) => ({
-            posts: [post, ...state.posts],
+          const { message } = await postService.createPost(data)
+          // After creating a post, refetch all posts to ensure policies are included
+          const posts = await postService.getAllPosts()
+          set({
+            posts,
             loading: false,
-          }))
+          })
           return { success: true, message }
         } catch (error: any) {
           set({

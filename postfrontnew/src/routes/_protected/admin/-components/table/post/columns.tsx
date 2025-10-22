@@ -69,8 +69,18 @@ export const createColumns = ({
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { can } = usePermissions()
 
+      // Check if user has general permissions for update/delete
+      const hasUpdatePermission = can.update('post')
+      const hasDeletePermission = can.delete('post')
+
+      // Check if user has specific permissions for this post based on policies
+      const canUpdateThisPost =
+        hasUpdatePermission && (post.policies?.can_update ?? false)
+      const canDeleteThisPost =
+        hasDeletePermission && (post.policies?.can_delete ?? false)
+
       // Si l'utilisateur n'a ni permission d'éditer ni de supprimer, ne pas afficher la colonne
-      if (!can.update('post') && !can.delete('post')) {
+      if (!canUpdateThisPost && !canDeleteThisPost) {
         return null
       }
 
@@ -85,12 +95,12 @@ export const createColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {can.update('post') && (
+            {canUpdateThisPost && (
               <DropdownMenuItem onClick={() => onEdit(post)}>
                 Edit post
               </DropdownMenuItem>
             )}
-            {can.delete('post') && (
+            {canDeleteThisPost && (
               <DropdownMenuItem
                 className="text-destructive"
                 onClick={() => onDelete(post)}

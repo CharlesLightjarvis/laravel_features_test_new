@@ -4,6 +4,7 @@ export interface Post {
   title: string
   description: string
   user_id: number
+  policies?: { can_update: boolean; can_delete: boolean }
   created_at: string
   updated_at: string
 }
